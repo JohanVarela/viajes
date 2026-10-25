@@ -203,6 +203,12 @@ label { font-weight: 500; font-size: .95rem; display: grid; gap: 6px; }
   padding: 14px 16px;
 }
 .instalar[hidden] { display: none; }
+
+/* El cartel de «Instalar» está pegado abajo y tapaba botones (el de guardar el
+   pedido, por ejemplo). Dos defensas: no se muestra mientras se pide un viaje, y
+   cuando está, deja aire al final para que ningún botón quede debajo. */
+body.pidiendo .instalar { display: none; }
+body.con-instalar { padding-bottom: 150px; }
 .instalar p {
   margin: 0 0 12px;
   font-size: .95rem;

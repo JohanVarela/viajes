@@ -10,7 +10,7 @@
 // IMPORTANTE: al cambiar archivos de la app, sube el número de VERSION.
 // Si no, el celular sigue mostrando la copia vieja.
 
-const VERSION = 'web-2026-10-25';
+const VERSION = 'web-2026-10-25-e712e510';
 const CASCARA = `viajes-cascara-${VERSION}`;
 // Los informes guardados NO llevan número de versión, y es a propósito:
 // si lo llevaran, cada vez que se cambie algo de la app se borrarían y te
@@ -31,6 +31,7 @@ const ARCHIVOS = [
   './icono-512.png',
   './icono.svg',
   './candado.mjs',
+  './buzon-clave.mjs',
   './data/caja.json',
 ];
 

@@ -35,6 +35,10 @@ const direccion = {
 // Es a propósito: una clave guardada es una clave que se encuentra si el
 // teléfono se pierde. Por eso tampoco se usa localStorage ni sessionStorage.
 let paquete = null;
+// La clave abierta vive SOLO en memoria mientras la app está abierta. Sirve para
+// dos cosas: abrir el viaje y firmar el pedido que se manda al buzón. No se
+// guarda en el teléfono (ni en localStorage ni en sessionStorage).
+let claveEnMemoria = null;
 
 async function abrirDatos() {
   const respuesta = await fetch('data/caja.json', { cache: 'no-store' });
@@ -110,6 +114,7 @@ async function pedirClave(sobre) {
       aviso.textContent = 'Abriendo…';
       try {
         const datos = await descifrar(clave, sobre);
+        claveEnMemoria = clave;
         capa.remove();
         resolver(datos);
       } catch (error) {
@@ -148,6 +153,9 @@ function mostrar(cual) {
     nodo.hidden = nombre !== cual;
   }
   $('volver').hidden = cual === 'lista';
+  // El cartel de «Instalar» va pegado abajo y tapaba el botón de guardar el
+  // pedido. Mientras se está pidiendo un viaje, no se muestra (el CSS lo esconde).
+  document.body.classList.toggle('pidiendo', cual === 'pedido');
   $('titulo-barra').textContent =
     cual === 'lista' ? 'Viajes' : cual === 'pedido' ? 'Pedir un destino' : $('titulo-barra').textContent;
   window.scrollTo(0, 0);
@@ -617,25 +625,100 @@ function agregarBotonCopiar(datos) {
   caja.prepend(boton);
 }
 
-async function enviarPedido(datos) {
-  if (ESTATICO) {
-    return { pedido: guardarPedidoLocal(datos), local: true };
-  }
-  const respuesta = await fetch('/api/pedido', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(datos),
-  });
-  // Se revisa la respuesta ANTES de leerla como JSON: si algo contesta algo
-  // que no es JSON, el aviso debe ser claro y no un error raro del navegador.
-  let resultado = {};
+// ---------- El buzón de pedidos ----------
+// Publicada como sitio estático, la app no puede escribir archivos. Por eso el
+// pedido se manda a un Worker de Cloudflare (worker/buzon.mjs).
+// Para que solo él y su pareja puedan escribir ahí, la app manda una «prueba»
+// calculada con la MISMA clave que abre el viaje: la clave no sale del teléfono
+// y con la prueba no se puede leer nada del viaje.
+// Si no hay buzón configurado, o no hay clave abierta, se sigue guardando en el
+// teléfono como antes, con el botón de copiar.
+let urlBuzon = null;
+let buzonLeido = false;
+let pruebaEnMemoria = null;
+
+async function leerDireccionBuzon() {
+  if (buzonLeido) return urlBuzon;
+  buzonLeido = true;
   try {
-    resultado = await respuesta.json();
+    const respuesta = await fetch('data/buzon.json', { cache: 'no-store' });
+    if (!respuesta.ok) return null;
+    const datos = await respuesta.json();
+    const url = String(datos.url || '').trim().replace(/\/+$/, '');
+    urlBuzon = /^https?:\/\//.test(url) ? url : null;
   } catch {
-    resultado = {};
+    urlBuzon = null;
   }
-  if (!respuesta.ok) throw new Error(resultado.error || 'No se pudo guardar el pedido');
-  return resultado;
+  return urlBuzon;
+}
+
+async function enviarAlBuzon(datos) {
+  const url = await leerDireccionBuzon();
+  if (!url) return { enviado: false, motivo: 'sin-buzon' };
+  if (!claveEnMemoria) return { enviado: false, motivo: 'sin-clave' };
+  let derivarPrueba;
+  try {
+    ({ derivarPrueba } = await import('./buzon-clave.mjs'));
+  } catch {
+    return { enviado: false, motivo: 'sin-clave' };
+  }
+  // La prueba se calcula una vez por sesión: cuesta un par de segundos.
+  if (!pruebaEnMemoria) pruebaEnMemoria = await derivarPrueba(claveEnMemoria);
+
+  // Sin límite de tiempo, un buzón que no contesta dejaría la pantalla en
+  // «Enviando…» para siempre.
+  const control = new AbortController();
+  const reloj = setTimeout(() => control.abort(), 20000);
+  try {
+    const respuesta = await fetch(url + '/pedido', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prueba: pruebaEnMemoria, pedido: datos }),
+      signal: control.signal,
+    });
+    let resultado = {};
+    try {
+      resultado = await respuesta.json();
+    } catch {
+      resultado = {};
+    }
+    if (!respuesta.ok) throw new Error(resultado.error || `el buzón contestó ${respuesta.status}`);
+    return { enviado: true, id: resultado.id };
+  } finally {
+    clearTimeout(reloj);
+  }
+}
+
+async function enviarPedido(datos) {
+  // Primero se guarda en el teléfono, pase lo que pase: si el envío falla, el
+  // pedido no se pierde y se puede copiar a mano.
+  if (!ESTATICO) {
+    const respuesta = await fetch('/api/pedido', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos),
+    });
+    // Se revisa la respuesta ANTES de leerla como JSON: si algo contesta algo
+    // que no es JSON, el aviso debe ser claro y no un error raro del navegador.
+    let resultado = {};
+    try {
+      resultado = await respuesta.json();
+    } catch {
+      resultado = {};
+    }
+    if (!respuesta.ok) throw new Error(resultado.error || 'No se pudo guardar el pedido');
+    return resultado;
+  }
+
+  const pedido = guardarPedidoLocal(datos);
+  try {
+    const envio = await enviarAlBuzon(datos);
+    return envio.enviado
+      ? { pedido, enviado: true, id: envio.id }
+      : { pedido, local: true, motivo: envio.motivo };
+  } catch (error) {
+    return { pedido, local: true, motivo: 'no-se-pudo', error: error.message };
+  }
 }
 
 $('form-pedido').elements.salidaISO.addEventListener('input', actualizarNoches);
@@ -743,9 +826,17 @@ $('form-pedido').addEventListener('submit', async (evento) => {
     const resultado = await enviarPedido(datos);
 
     estado.className = 'aviso bien';
-    estado.textContent = resultado.local
-      ? 'Guardado en este teléfono. Toca «Copiar el pedido» y pásamelo en el chat: yo lo investigo.'
-      : `Guardado. Dile al agente: «ya pedí ${resultado.pedido.destino} en la app» y lo investiga.`;
+    if (resultado.enviado) {
+      estado.textContent =
+        'Enviado. Ya está en mi buzón: cuando abra mi sesión lo leo y te preparo el informe. Queda una copia en este teléfono.';
+    } else if (resultado.motivo === 'no-se-pudo') {
+      estado.textContent = `No pude mandarlo al buzón (${resultado.error}). Quedó guardado en este teléfono: toca «Copiar el pedido» y pásamelo en el chat.`;
+    } else if (resultado.local) {
+      estado.textContent =
+        'Guardado en este teléfono. Toca «Copiar el pedido» y pásamelo en el chat: yo lo investigo.';
+    } else {
+      estado.textContent = `Guardado. Dile al agente: «ya pedí ${resultado.pedido.destino} en la app» y lo investiga.`;
+    }
     evento.target.reset();
     actualizarNoches();
 
@@ -899,10 +990,12 @@ if ('serviceWorker' in navigator) {
     if (mostrado) return;
     mostrado = true;
     caja.hidden = false;
+    document.body.classList.add('con-instalar');
   };
 
   const cerrar = () => {
     caja.hidden = true;
+    document.body.classList.remove('con-instalar');
     localStorage.setItem('viajes-instalar-oculto', 'si');
   };
 
@@ -940,6 +1033,7 @@ if ('serviceWorker' in navigator) {
     await eventoInstalar.userChoice;
     eventoInstalar = null;
     caja.hidden = true;
+    document.body.classList.remove('con-instalar');
   });
   $('instalar-no').addEventListener('click', cerrar);
 
@@ -947,6 +1041,7 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('appinstalled', () => {
     localStorage.setItem('viajes-instalar-oculto', 'si');
     caja.hidden = true;
+    document.body.classList.remove('con-instalar');
   });
 })();
 
