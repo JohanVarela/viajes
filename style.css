@@ -1,0 +1,445 @@
+/* Diseño primero para celular: una sola columna, letra grande, botones grandes. */
+
+:root {
+  --fondo: #f6f4ef;
+  --papel: #ffffff;
+  --tinta: #1d1b18;
+  --suave: #6b665e;
+  --linea: #e2ddd2;
+  --acento: #0f4c5c;
+  --acento-suave: #e3eef0;
+  --aviso: #8a5a00;
+  --aviso-fondo: #fdf3dd;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--tinta);
+  font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+}
+
+/* Barra de arriba */
+.barra {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
+  background: var(--acento);
+  color: #fff;
+}
+.barra h1 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: .2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.icono {
+  background: rgba(255, 255, 255, .16);
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 14px;
+}
+
+/* Buscador y botones */
+input, textarea {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 12px;
+  padding: 13px 14px;
+}
+input:focus, textarea:focus {
+  outline: 2px solid var(--acento);
+  outline-offset: 1px;
+}
+textarea { resize: vertical; }
+
+.acciones { margin: 12px 0 4px; }
+
+.principal {
+  width: 100%;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: var(--acento);
+  border: 0;
+  border-radius: 12px;
+  padding: 15px 16px;
+  min-height: 52px;
+}
+
+/* Lista de informes */
+.lista { display: grid; gap: 10px; margin-top: 12px; }
+
+.tarjeta {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 14px;
+  padding: 14px 16px;
+  min-height: 44px;
+}
+.tarjeta:active { background: var(--acento-suave); }
+.tarjeta .nombre { font-weight: 600; display: block; }
+.tarjeta .detalle { color: var(--suave); font-size: .95rem; }
+
+.vacio, .meta {
+  color: var(--suave);
+  font-size: .95rem;
+  padding: 4px 2px;
+}
+
+/* Vista de un informe */
+#informe-meta { margin-top: 0; }
+
+details.seccion {
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 14px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+details.seccion > summary {
+  cursor: pointer;
+  padding: 14px 16px;
+  min-height: 52px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  list-style: none;
+}
+details.seccion > summary::-webkit-details-marker { display: none; }
+details.seccion > summary::after { content: "+"; color: var(--acento); font-size: 1.4rem; }
+details.seccion[open] > summary::after { content: "–"; }
+details.seccion[open] > summary { border-bottom: 1px solid var(--linea); }
+
+.cuerpo { padding: 4px 16px 16px; }
+
+.cuerpo h3 { font-size: 1rem; margin: 18px 0 6px; }
+.cuerpo p { margin: 10px 0; }
+.cuerpo ul { padding-left: 20px; margin: 10px 0; }
+.cuerpo li { margin: 6px 0; }
+.cuerpo a { color: var(--acento); }
+.cuerpo hr { border: 0; border-top: 1px solid var(--linea); margin: 18px 0; }
+.cuerpo code {
+  background: var(--acento-suave);
+  border-radius: 6px;
+  padding: 1px 5px;
+  font-size: .9em;
+}
+
+/* Tablas: se deslizan de lado si son anchas */
+.tabla-envoltura { overflow-x: auto; margin: 12px 0; }
+.cuerpo table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: .95rem;
+}
+.cuerpo th, .cuerpo td {
+  border: 1px solid var(--linea);
+  padding: 9px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.cuerpo th { background: var(--acento-suave); font-weight: 600; }
+
+/* Formulario */
+form { display: grid; gap: 12px; }
+label { font-weight: 500; font-size: .95rem; display: grid; gap: 6px; }
+.aviso {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--aviso-fondo);
+  color: var(--aviso);
+  font-size: .95rem;
+}
+.aviso:empty { display: none; }
+.aviso.bien { background: var(--acento-suave); color: var(--acento); }
+
+/* Aviso para instalar la app en el celular */
+.instalar {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 20;
+  max-width: 656px;
+  margin: 0 auto;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(20, 30, 34, .18);
+  padding: 14px 16px;
+}
+.instalar[hidden] { display: none; }
+.instalar p {
+  margin: 0 0 12px;
+  font-size: .95rem;
+}
+.instalar-botones {
+  display: flex;
+  gap: 10px;
+}
+.instalar-botones .principal { width: auto; flex: 1; min-height: 48px; padding: 12px 16px; }
+.secundario {
+  font: inherit;
+  color: var(--suave);
+  background: transparent;
+  border: 1px solid var(--linea);
+  border-radius: 12px;
+  padding: 12px 16px;
+  min-height: 48px;
+}
+.instalar-botones .secundario { width: auto; }
+.secundario[hidden] { display: none; }
+
+/* Sin conexión: aviso discreto arriba */
+.sin-red {
+  background: var(--aviso-fondo);
+  color: var(--aviso);
+  font-size: .95rem;
+  text-align: center;
+  padding: 6px 12px;
+}
+
+/* ---------- Mi viaje: la tarjeta destacada del inicio ---------- */
+
+.destacado {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: #fff;
+  background: var(--acento);
+  border: 0;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 10px 0 2px;
+  min-height: 44px;
+}
+.destacado .arriba {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+.destacado .nombredestacado { font-weight: 700; font-size: 1.05rem; }
+.destacado .detalledestacado { font-size: .95rem; opacity: .92; display: block; margin-top: 4px; }
+.destacado .pastilla {
+  font-size: .95rem;
+  font-weight: 600;
+  border-radius: 99px;
+  padding: 2px 10px;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, .18);
+}
+
+/* ---------- Mi viaje: la pantalla ---------- */
+
+.titulo-bloque {
+  font-size: 1.02rem;
+  margin: 24px 0 10px;
+}
+
+.semaforo {
+  border-radius: 14px;
+  border: 1px solid;
+  padding: 13px 15px;
+  margin-top: 12px;
+}
+.semaforo .titulo-semaforo { font-weight: 700; display: block; margin-bottom: 4px; }
+.semaforo ul { margin: 6px 0 0; padding-left: 20px; }
+.semaforo li { font-size: .95rem; margin: 3px 0; }
+.semaforo.verde { background: #e6f2e9; border-color: #b9dcc2; color: #1e5b2c; }
+.semaforo.amarillo { background: var(--aviso-fondo); border-color: #eccf95; color: var(--aviso); }
+.semaforo.rojo { background: #fbe7e4; border-color: #eabbb1; color: #8a2b1c; }
+
+.cifra-grande {
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-top: 10px;
+}
+.cifra-grande .valor {
+  display: block;
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+.cifra-grande .rotulo { color: var(--suave); font-size: .95rem; }
+.avance {
+  height: 10px;
+  background: var(--linea);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+.avance > span { display: block; height: 100%; background: var(--acento); }
+.avance.lleno > span { background: #8a2b1c; }
+
+.mini-cifras {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+.mini {
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
+}
+.mini .valor {
+  display: block;
+  font-weight: 700;
+  font-size: 1.02rem;
+  font-variant-numeric: tabular-nums;
+}
+.mini .rotulo { color: var(--suave); font-size: .95rem; }
+
+.rubro, .vuelo-opcion, .base, .pendiente {
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+.fila .nom { font-weight: 600; }
+.fila .monto {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.nota { color: var(--suave); font-size: .95rem; margin: 6px 0 0; }
+
+.chip {
+  display: inline-block;
+  font-size: .95rem;
+  border-radius: 99px;
+  padding: 1px 9px;
+  white-space: nowrap;
+}
+.chip.verificado { background: #e6f2e9; color: #1e5b2c; }
+.chip.estimado { background: var(--aviso-fondo); color: var(--aviso); }
+.chip.falta { background: #fbe7e4; color: #8a2b1c; }
+
+.pendiente { display: grid; grid-template-columns: 20px 1fr; gap: 8px; }
+.pendiente .marca { font-weight: 700; color: var(--aviso); }
+.pendiente .donde { color: var(--suave); font-size: .95rem; }
+
+/* Resultado del plan de un viaje nuevo */
+.plan {
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-top: 14px;
+}
+.plan h3 { margin: 0 0 8px; font-size: 1.02rem; }
+.plan ul { padding-left: 20px; margin: 8px 0; }
+.plan li { margin: 6px 0; font-size: .95rem; }
+.plan .grupo { font-weight: 600; margin: 12px 0 2px; display: block; }
+
+.fila-fechas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ---------- El candado: la pantalla que pide la clave ---------- */
+/* Tapa todo hasta que se escribe la clave. Sin la clave no hay viaje. */
+.capa-clave {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--papel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.caja-clave {
+  width: 100%;
+  max-width: 420px;
+  display: block;
+}
+.caja-clave h2 {
+  font-size: 1.25rem;
+  margin: 0 0 6px;
+}
+.caja-clave label {
+  display: block;
+  font-weight: 600;
+  margin: 16px 0 6px;
+}
+.caja-clave input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px;
+  font-size: 1.05rem;
+  font-family: inherit;
+  border: 1px solid #c9c9c9;
+  border-radius: 10px;
+  background: #fff;
+}
+.caja-clave input:focus {
+  outline: 2px solid var(--acento);
+  outline-offset: 1px;
+}
+.caja-clave .principal {
+  width: 100%;
+  margin-top: 14px;
+  min-height: 48px;
+}
+.caja-clave .sin-caja {
+  margin-top: 10px;
+  width: 100%;
+  min-height: 44px;
+  background: none;
+  border: none;
+  color: var(--acento);
+  font: inherit;
+  font-size: .95rem;
+  text-decoration: underline;
+  cursor: pointer;
+}

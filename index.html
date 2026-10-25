@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es" data-modo="estatico">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f4c5c">
+  <meta name="description" content="Mis informes de viaje: vuelos, dónde dormir, qué comer, cómo moverse y cuánto cuesta.">
+  <title>Viajes</title>
+
+  <!-- Para instalarla en el celular como si fuera una app -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icono.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icono-180.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Viajes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <header class="barra">
+    <button id="volver" class="icono" hidden aria-label="Volver">←</button>
+    <h1 id="titulo-barra">Viajes</h1>
+  </header>
+
+  <!-- Pantalla 1: lista de informes -->
+  <main id="vista-lista">
+    <input id="buscar" type="search" placeholder="Buscar un destino…" autocomplete="off">
+
+    <div class="acciones">
+      <button id="btn-pedir" class="principal">+ Pedir un destino</button>
+    </div>
+
+    <div id="viaje-destacado"></div>
+
+    <div id="lista" class="lista" aria-live="polite">
+      <p class="vacio">Cargando…</p>
+    </div>
+  </main>
+
+  <!-- Pantalla 2: un informe -->
+  <main id="vista-informe" hidden>
+    <p id="informe-meta" class="meta"></p>
+    <div id="informe-cuerpo"></div>
+  </main>
+
+  <!-- Pantalla 3: pedir un destino -->
+  <main id="vista-pedido" hidden>
+    <p class="meta">Escribe qué viaje quieres. Se guarda en tu computadora y el agente lo lee después.</p>
+    <form id="form-pedido">
+      <label>Destino o zona
+        <select id="sel-destino" name="destino" required>
+          <option value="">— Elegí el destino —</option>
+          <optgroup label="Italia y los Alpes">
+            <option>Norte de Italia + Venecia</option>
+            <option>Lago di Como, Italia</option>
+            <option>Lago di Garda, Italia</option>
+            <option>Venecia, Italia</option>
+            <option>Milán, Italia</option>
+            <option>Roma, Italia</option>
+            <option>Florencia y la Toscana</option>
+            <option>Nápoles y la costa amalfitana</option>
+            <option>Suiza: Bernina y los Alpes</option>
+          </optgroup>
+          <optgroup label="Resto de Europa">
+            <option>Lisboa y Portugal</option>
+            <option>Madrid y Toledo</option>
+            <option>Barcelona</option>
+            <option>París</option>
+            <option>Ámsterdam y los Países Bajos</option>
+            <option>Praga y Budapest</option>
+            <option>Grecia: Atenas y las islas</option>
+            <option>Estambul, Turquía</option>
+          </optgroup>
+          <optgroup label="Centroamérica, México y el Caribe">
+            <option>Panamá: Ciudad y playas</option>
+            <option>Costa Rica: volcanes y playa</option>
+            <option>Guatemala: Antigua y Atitlán</option>
+            <option>Cancún y Riviera Maya</option>
+            <option>Ciudad de México y alrededores</option>
+            <option>Curazao y Aruba</option>
+            <option>Roatán y las Islas de la Bahía</option>
+          </optgroup>
+          <optgroup label="Sudamérica">
+            <option>Bogotá y la zona cafetera</option>
+            <option>Cartagena y San Andrés, Colombia</option>
+            <option>Lima y Cusco, Perú</option>
+            <option>Santiago y Valparaíso, Chile</option>
+            <option>Buenos Aires y Bariloche</option>
+            <option>Río de Janeiro, Brasil</option>
+          </optgroup>
+          <option value="__otro">Otro (escribirlo a mano)</option>
+        </select>
+      </label>
+      <label>Cuándo (toca y elige el mes)
+        <select id="sel-fechas" name="fechas">
+          <option value="">— Todavía no sé, quiero comparar —</option>
+          <option value="__otro">Otro (escribirlo a mano)</option>
+        </select>
+      </label>
+      <div class="fila-fechas">
+        <label>Día de salida
+          <input type="date" name="salidaISO">
+        </label>
+        <label>Día de vuelta
+          <input type="date" name="vueltaISO">
+        </label>
+      </div>
+      <p id="noches-calculadas" class="meta">Con los dos días exactos la app calcula las noches y cuánto te toca por noche.</p>
+      <label>Ciudad de salida (toca y elige el aeropuerto)
+        <select id="sel-salida" name="salida">
+          <option value="">— Elegí tu ciudad —</option>
+          <!-- LISTA-PUBLICA:INICIO -->
+          <optgroup label="Honduras">
+            <option>San Pedro Sula (SAP)</option>
+            <option>Palmerola, Comayagua (XPL)</option>
+            <option>Tegucigalpa, Toncontín (TGU)</option>
+            <option>Roatán (RTB)</option>
+            <option>La Ceiba (LCE)</option>
+          </optgroup>
+          <optgroup label="Resto de Centroamérica y Belice">
+            <option>Ciudad de Guatemala (GUA)</option>
+            <option>San Salvador (SAL)</option>
+            <option>Managua (MGA)</option>
+            <option>San José (SJO)</option>
+            <option>Liberia, Guanacaste (LIR)</option>
+            <option>Ciudad de Panamá (PTY)</option>
+            <option>David, Chiriquí (DAV)</option>
+            <option>Bocas del Toro (BOC)</option>
+            <option>Ciudad de Belice (BZE)</option>
+          </optgroup>
+          <optgroup label="México">
+            <option>Cancún (CUN)</option>
+            <option>Ciudad de México (MEX)</option>
+            <option>Guadalajara (GDL)</option>
+            <option>Puerto Vallarta (PVR)</option>
+          </optgroup>
+          <optgroup label="Estados Unidos">
+            <option>Miami (MIA)</option>
+            <option>Orlando (MCO)</option>
+            <option>Houston (IAH)</option>
+            <option>Atlanta (ATL)</option>
+            <option>Nueva York (JFK)</option>
+            <option>Los Ángeles (LAX)</option>
+          </optgroup>
+          <optgroup label="Sudamérica">
+            <option>Bogotá (BOG)</option>
+            <option>Medellín (MDE)</option>
+            <option>Cartagena (CTG)</option>
+            <option>San Andrés (ADZ)</option>
+            <option>Lima (LIM)</option>
+            <option>Cusco (CUZ)</option>
+            <option>Santiago (SCL)</option>
+            <option>Buenos Aires (EZE)</option>
+            <option>São Paulo (GRU)</option>
+            <option>Río de Janeiro (GIG)</option>
+          </optgroup>
+          <optgroup label="Europa">
+            <option>Madrid (MAD)</option>
+            <option>Barcelona (BCN)</option>
+            <option>Lisboa (LIS)</option>
+            <option>París (CDG)</option>
+            <option>Ámsterdam (AMS)</option>
+            <option>Fráncfort (FRA)</option>
+            <option>Roma (FCO)</option>
+            <option>Milán, Malpensa (MXP)</option>
+            <option>Venecia (VCE)</option>
+          </optgroup>
+          <!-- LISTA-PUBLICA:FIN -->
+          <option value="__otro">Otro (escribirlo a mano)</option>
+        </select>
+      </label>
+      <label>Personas
+        <input name="personas" inputmode="numeric" placeholder="2">
+      </label>
+      <label>Presupuesto total (USD)
+        <input name="presupuesto" inputmode="numeric" placeholder="2000">
+      </label>
+      <label>Notas
+        <textarea name="notas" rows="3" placeholder="Quiero playa y pueblo, no me importa caminar"></textarea>
+      </label>
+      <button type="submit" class="principal">Guardar pedido</button>
+      <p id="pedido-estado" class="aviso" aria-live="polite"></p>
+    </form>
+    <div id="plan-resultado" hidden></div>
+  </main>
+
+  <!-- Pantalla 4: mi viaje, con las cuentas y lo que falta -->
+  <main id="vista-viaje" hidden>
+    <div id="viaje-cabeza"></div>
+    <div id="viaje-semaforo"></div>
+    <div id="viaje-cuentas"></div>
+    <h2 class="titulo-bloque">En qué se va el dinero</h2>
+    <div id="viaje-rubros"></div>
+    <h2 class="titulo-bloque">El vuelo, tres formas de pagar</h2>
+    <div id="viaje-vuelo"></div>
+    <h2 class="titulo-bloque">Dónde se duerme</h2>
+    <div id="viaje-bases"></div>
+    <h2 class="titulo-bloque">Lo que falta confirmar</h2>
+    <div id="viaje-pendientes"></div>
+    <div class="acciones">
+      <button id="viaje-informe" class="principal">Ver el informe completo</button>
+    </div>
+    <p id="viaje-pie" class="meta"></p>
+  </main>
+
+  <!-- Aviso para instalarla. Se muestra solo si el celular lo permite. -->
+  <div id="instalar" class="instalar" hidden>
+    <p id="instalar-texto">Ponla en la pantalla de inicio y ábrela como una app, sin buscar el navegador.</p>
+    <div class="instalar-botones">
+      <button id="instalar-si" class="principal">Instalar</button>
+      <button id="instalar-no" class="secundario">Ahora no</button>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

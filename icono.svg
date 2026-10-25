@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Viajes: sol, montaña y lago">
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0f4c5c"/>
+      <stop offset="1" stop-color="#08303c"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#cielo)"/>
+  <circle cx="340" cy="151" r="59" fill="#f6f4ef"/>
+  <polygon points="26,379 205,169 384,379" fill="#4f8894"/>
+  <polygon points="169,410 315,220 461,410" fill="#e3eef0"/>
+  <rect x="0" y="381" width="512" height="131" fill="#7fb3bd"/>
+  <rect x="0" y="406" width="512" height="13" fill="#0f4c5c"/>
+  <rect x="0" y="437" width="512" height="13" fill="#0f4c5c"/>
+  <rect x="0" y="468" width="512" height="13" fill="#0f4c5c"/>
+</svg>
