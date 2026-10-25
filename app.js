@@ -71,7 +71,7 @@ async function pedirClave(sobre) {
   // El candado se carga aparte para que la portada abra rápido cuando no hace falta.
   let descifrar;
   try {
-    ({ descifrar } = await import('./candado.mjs'));
+    ({ descifrar } = await import('./candado.mjs?v=6aa86e7e'));
   } catch {
     throw new Error('No pude cargar el candado del sitio.');
   }
@@ -658,7 +658,7 @@ async function enviarAlBuzon(datos) {
   if (!claveEnMemoria) return { enviado: false, motivo: 'sin-clave' };
   let derivarPrueba;
   try {
-    ({ derivarPrueba } = await import('./buzon-clave.mjs'));
+    ({ derivarPrueba } = await import('./buzon-clave.mjs?v=6aa86e7e'));
   } catch {
     return { enviado: false, motivo: 'sin-clave' };
   }
@@ -858,7 +858,7 @@ async function pedirPlan(datos) {
     let plan;
     if (ESTATICO) {
       // El mismo cálculo que hace el servidor, pero acá mismo en el teléfono.
-      const { armarPlan } = await import('./plan.mjs');
+      const { armarPlan } = await import('./plan.mjs?v=6aa86e7e');
       plan = armarPlan(datos);
     } else {
       const respuesta = await fetch('/api/plan', {
