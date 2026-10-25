@@ -5,7 +5,7 @@
 // estático (sin servidor). Si acá se importara algo de Node, la app publicada
 // dejaría de poder calcular el plan.
 
-import { checklistBase, diasEntre, fechaLarga } from './modelo-viaje.mjs?v=6aa86e7e';
+import { checklistBase, diasEntre, fechaLarga } from './modelo-viaje.mjs?v=c916271d';
 
 export function limpiar(valor, maximo = 200) {
   return String(valor ?? '').trim().slice(0, maximo);

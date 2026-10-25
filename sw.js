@@ -10,7 +10,7 @@
 // IMPORTANTE: al cambiar archivos de la app, sube el número de VERSION.
 // Si no, el celular sigue mostrando la copia vieja.
 
-const VERSION = 'web-2026-10-25-f1d7f858';
+const VERSION = 'web-2026-10-25-c275f768';
 const CASCARA = `viajes-cascara-${VERSION}`;
 // Los informes guardados NO llevan número de versión, y es a propósito:
 // si lo llevaran, cada vez que se cambie algo de la app se borrarían y te
@@ -21,12 +21,12 @@ const DATOS = 'viajes-datos';
 const ARCHIVOS = [
   './',
   './index.html',
-  './style.css?v=6aa86e7e',
-  './app.js?v=6aa86e7e',
-  './plan.mjs?v=6aa86e7e',
-  './modelo-viaje.mjs?v=6aa86e7e',
-  './candado.mjs?v=6aa86e7e',
-  './buzon-clave.mjs?v=6aa86e7e',
+  './style.css?v=c916271d',
+  './app.js?v=c916271d',
+  './plan.mjs?v=c916271d',
+  './modelo-viaje.mjs?v=c916271d',
+  './candado.mjs?v=c916271d',
+  './buzon-clave.mjs?v=c916271d',
   './app.js',
   './style.css',
   './plan.mjs',

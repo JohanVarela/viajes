@@ -71,7 +71,7 @@ async function pedirClave(sobre) {
   // El candado se carga aparte para que la portada abra rápido cuando no hace falta.
   let descifrar;
   try {
-    ({ descifrar } = await import('./candado.mjs?v=6aa86e7e'));
+    ({ descifrar } = await import('./candado.mjs?v=c916271d'));
   } catch {
     throw new Error('No pude cargar el candado del sitio.');
   }
@@ -658,7 +658,7 @@ async function enviarAlBuzon(datos) {
   if (!claveEnMemoria) return { enviado: false, motivo: 'sin-clave' };
   let derivarPrueba;
   try {
-    ({ derivarPrueba } = await import('./buzon-clave.mjs?v=6aa86e7e'));
+    ({ derivarPrueba } = await import('./buzon-clave.mjs?v=c916271d'));
   } catch {
     return { enviado: false, motivo: 'sin-clave' };
   }
@@ -819,6 +819,9 @@ $('form-pedido').addEventListener('submit', async (evento) => {
   evento.preventDefault();
   const estado = $('pedido-estado');
   const datos = Object.fromEntries(new FormData(evento.target).entries());
+  // «Personas» es opcional (el formulario sugiere 2). Si queda vacío se manda 2:
+  // un pedido sin personas obliga a preguntar, y este viaje es siempre de a dos.
+  if (!String(datos.personas || '').trim()) datos.personas = '2';
   estado.className = 'aviso';
   estado.textContent = 'Guardando…';
 
@@ -858,7 +861,7 @@ async function pedirPlan(datos) {
     let plan;
     if (ESTATICO) {
       // El mismo cálculo que hace el servidor, pero acá mismo en el teléfono.
-      const { armarPlan } = await import('./plan.mjs?v=6aa86e7e');
+      const { armarPlan } = await import('./plan.mjs?v=c916271d');
       plan = armarPlan(datos);
     } else {
       const respuesta = await fetch('/api/plan', {
