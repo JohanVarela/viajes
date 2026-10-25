@@ -117,6 +117,14 @@ textarea { resize: vertical; }
   padding: 4px 2px;
 }
 
+/* Qué versión está corriendo: apenas visible, al pie de la lista. */
+.version-app {
+  font-size: .95rem;
+  text-align: center;
+  margin: 24px 0 8px;
+  opacity: .7;
+}
+
 /* Vista de un informe */
 #informe-meta { margin-top: 0; }
 

@@ -963,14 +963,48 @@ $('buscar').addEventListener('input', (evento) => dibujarLista(evento.target.val
 // El service worker es lo que permite abrirla sin señal. Solo se puede usar
 // si la página viene de localhost o de una dirección segura (https).
 if ('serviceWorker' in navigator) {
+  // Si ya había una versión guardada, cuando la nueva tome el mando hay que
+  // recargar una vez: los archivos fijos se sirven del teléfono antes que de la
+  // red, y sin recargar se seguía viendo la versión vieja.
+  const yaHabia = Boolean(navigator.serviceWorker.controller);
+  let recargado = false;
+
   window.addEventListener('load', () => {
     // Dirección relativa a propósito: así funciona igual si el sitio se publica
     // dentro de una subcarpeta (por ejemplo usuario.github.io/viajes/).
-    navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(() => {
-      // Sin service worker la app sigue funcionando, solo que con internet.
-    });
+    navigator.serviceWorker
+      .register('./sw.js', { scope: './' })
+      .then((registro) => {
+        // Sin esto el navegador busca la versión nueva cada muchas horas (o al
+        // día siguiente), y el teléfono se queda con la vieja sin avisar. Se pide
+        // a mano en cada apertura; si no hay nada nuevo, no cuesta nada.
+        registro.update().catch(() => {});
+      })
+      .catch(() => {
+        // Sin service worker la app sigue funcionando, solo que con internet.
+      });
+  });
+
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!yaHabia || recargado) return;
+    recargado = true;
+    location.reload();
   });
 }
+
+// La versión que está corriendo, escrita chiquita al pie de la lista. Sirve para
+// responder sin dudas «¿qué versión tenés?» cuando algo no se actualiza.
+(function mostrarVersion() {
+  const donde = $('version-app');
+  if (!donde) return;
+  fetch('./sw.js', { cache: 'no-store' })
+    .then((respuesta) => (respuesta.ok ? respuesta.text() : ''))
+    .then((texto) => {
+      const cual = /const VERSION = '([^']+)'/.exec(texto || '');
+      if (cual) donde.textContent = `Versión ${cual[1]}`;
+    })
+    .catch(() => {});
+})();
 
 // Aviso abajo para ponerla en la pantalla de inicio.
 (function avisoInstalar() {
